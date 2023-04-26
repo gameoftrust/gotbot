@@ -100,7 +100,7 @@ export async function initializeClientWallet(
       ...Markup.inlineKeyboard([
         Markup.button.url(i18next.t("openWallet"), deeplinkUri),
       ]),
-      ...Markup.removeKeyboard()
+      // ...Markup.removeKeyboard()
     }
   );
   return clientWallet;
