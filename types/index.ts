@@ -116,6 +116,7 @@ export interface ReputationGraphMetadata {
     address: string;
     chainId: number;
   };
+  endorsementManifestURI: string;
   mainTopicId: TopicId;
   questionTopicIds: TopicId[];
 }

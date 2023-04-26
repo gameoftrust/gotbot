@@ -97,11 +97,11 @@ export function canAccessBot(account: string) {
   return canAccessGroup(account);
 }
 
-export async function sendUserEndorsementLink(ctx: TelegramBotContext) {
+export async function sendUserProfileLink(ctx: TelegramBotContext) {
   const { account } = getSession(ctx);
   if (!account) throw new Error("account not provided");
   return ctx.reply(
-    i18next.t("endorsementLinkMessage", {
+    i18next.t("profileLinkMessage", {
       endorsementLink: getViewProfileLink(ctx, account),
     }),
     {
@@ -116,7 +116,7 @@ export function getMainMenuKeyboard() {
     [i18next.t("sendMessage.sendMessageInGroup")],
     [i18next.t("sendMessage.sendReplyOrComment")],
     [i18next.t("getGroupInvitationLink")],
-    [i18next.t("getEndorsementLink")],
+    [i18next.t("getProfileLink")],
     [i18next.t("nickname.setNickname")],
   ]);
 }
@@ -154,8 +154,8 @@ export async function handleConnectedUserState(
     if (message === i18next.t("checkAgain")) {
       await ctx.reply(i18next.t("notEndorsedYet"));
     }
-    return sendUserEndorsementLink(ctx);
-    // await sendUserEndorsementLink(ctx);
+    return sendUserProfileLink(ctx);
+    // await sendUserProfileLink(ctx);
     // return ctx.reply(i18next.t("sendCheckAgainAfterYouGotEndorsed"), {
     //   ...replyMarkupArguments(createKeyboard([[i18next.t("checkAgain")]])),
     //   parse_mode: "Markdown",
@@ -193,12 +193,12 @@ export async function handleConnectedUserState(
           return ctx.reply(String(e));
         }
       } else {
-        return sendUserEndorsementLink(ctx);
+        return sendUserProfileLink(ctx);
       }
     }
 
-    if (message === i18next.t("getEndorsementLink")) {
-      await sendUserEndorsementLink(ctx);
+    if (message === i18next.t("getProfileLink")) {
+      await sendUserProfileLink(ctx);
     }
 
     return sendMainMenuMessage(ctx);

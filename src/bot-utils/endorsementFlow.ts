@@ -29,6 +29,7 @@ import {
 } from "../i18n";
 import { store } from "../store";
 import {
+  selectEndorsementManifestURI,
   selectQuestionTopicIds,
   selectTopicScoreType,
 } from "../store/reputationGraph/selectors";
@@ -69,7 +70,7 @@ export function getViewProfileLink(ctx: TelegramBotContext, address: string) {
   }=${address}`;
 }
 
-export function getEndorsementLink(ctx: TelegramBotContext, address: string) {
+export function getProfileLink(ctx: TelegramBotContext, address: string) {
   return `https://t.me/${getBotInfo(ctx).username}?start=${
     ParameterKey.ENDORSE
   }=${address}`;
@@ -88,6 +89,7 @@ export async function handleEndorsementFlow(
   const { account, userToEndorse, scene, draftScores } = session;
   const state = store.getState();
   const questionTopicIds = selectQuestionTopicIds(state);
+  const endorsementManifestURI = selectEndorsementManifestURI(state);
 
   if (!account) throw new Error("account not provided");
 
@@ -109,6 +111,7 @@ export async function handleEndorsementFlow(
     }
     return ctx.reply(
       i18next.t("endorsementGuide", {
+        endorsementManifestLink: endorsementManifestURI,
         userProfile: "`" + addressToRepresentation(userToEndorse) + "`",
       }),
       {
@@ -136,7 +139,7 @@ export async function handleEndorsementFlow(
   }
   if (message) {
     if (i === questionTopicIds.length)
-      return ctx.reply(i18next.t("confirmScoresSignature"), {
+      return ctx.reply(i18next.t("confirmSignature"), {
         ...replyMarkupArguments(openWalletButton(ctx)),
       });
     const topicId = questionTopicIds[i];

@@ -46,6 +46,8 @@ export async function setupWallet(ctx: TelegramBotContext, walletName: string) {
 
 export async function chooseWallet(ctx: TelegramBotContext) {
   return ctx.reply(i18next.t("chooseWallet"), {
+    parse_mode: "Markdown",
+    disable_web_page_preview: true,
     ...replyMarkupArguments(
       createKeyboard(clientWalletTypes.map((wt) => [wt.name]))
     ),

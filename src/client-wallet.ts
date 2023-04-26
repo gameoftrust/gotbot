@@ -8,7 +8,7 @@ import qr from "qrcode";
 import { Markup } from "telegraf";
 import { getSession } from "./session-utils";
 import i18next from "i18next";
-import { replyMarkupArguments } from "./bot-utils";
+import {createKeyboard, replyMarkupArguments} from "./bot-utils";
 import { v4 as uuidv4 } from "uuid";
 import { addWalletConnection } from "./store/walletConnections";
 import { store } from "./store";
@@ -22,19 +22,14 @@ type ClientWalletType = {
 
 export const clientWalletTypes: ClientWalletType[] = [
   {
-    name: "MetaMask Mobile",
-    deeplink: "https://metamask.app.link/",
-    supportsOpenAppByDeeplinkAfterConnect: true,
-  },
-  {
     name: "Trust Wallet",
     deeplink: "https://link.trustwallet.com/",
     supportsOpenAppByDeeplinkAfterConnect: true,
   },
   {
-    name: "Zerion",
-    deeplink: "https://link.zerion.io/",
-    supportsOpenAppByDeeplinkAfterConnect: false,
+    name: "MetaMask Mobile",
+    deeplink: "https://metamask.app.link/",
+    supportsOpenAppByDeeplinkAfterConnect: true,
   },
   {
     name: "Elastos Essentials",
@@ -44,11 +39,6 @@ export const clientWalletTypes: ClientWalletType[] = [
   {
     name: "Avacus",
     deeplink: "https://avacus.app.link/",
-    supportsOpenAppByDeeplinkAfterConnect: false,
-  },
-  {
-    name: "Rainbow",
-    deeplink: "https://rnbwapp.com/",
     supportsOpenAppByDeeplinkAfterConnect: false,
   },
 ];
@@ -110,6 +100,7 @@ export async function initializeClientWallet(
       ...Markup.inlineKeyboard([
         Markup.button.url(i18next.t("openWallet"), deeplinkUri),
       ]),
+      ...Markup.removeKeyboard()
     }
   );
   return clientWallet;
@@ -193,7 +184,7 @@ export async function signTypedDataWithClientWallet(
     ctx.session.pendingWalletAction = {
       walletAction: (activeClientWallet: ClientWallet) => {
         ctx.reply(
-          i18next.t("confirmScoresSignature") +
+          i18next.t("confirmSignature") +
             i18next.t("signatureReconnectWalletHelpMessage"),
           {
             ...replyMarkupArguments(openWalletButton(ctx)),

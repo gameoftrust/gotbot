@@ -27,6 +27,7 @@ const initialReputationGraphState: ReputationGraphState = {
       address: "0x0",
       chainId: 0,
     },
+    endorsementManifestURI: '',
     mainTopicId: "0",
     questionTopicIds: ["0"],
   },

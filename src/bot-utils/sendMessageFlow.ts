@@ -14,7 +14,7 @@ import {
   getTelegramApi,
   replyMarkupArguments,
   sendMainMenuMessage,
-  sendUserEndorsementLink,
+  sendUserProfileLink,
 } from "./index";
 import { GROUP_ID } from "../constants";
 
@@ -106,7 +106,7 @@ export async function handleSendMessageFlow(
       }
       return sendMainMenuMessage(ctx);
     } else {
-      return sendUserEndorsementLink(ctx);
+      return sendUserProfileLink(ctx);
     }
   }
 

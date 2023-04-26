@@ -25,7 +25,6 @@ export const fetchReputationGraphMetadata = createAsyncThunk(
       .call();
     const metadata = (await axios.get<ReputationGraphMetadata>(metaDataURI))
       .data;
-
     const reputationTopicContract = new web3.eth.Contract(
       ReputationTopicAbi as AbiItem[],
       metadata.topicNftContract.address

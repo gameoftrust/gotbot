@@ -16,6 +16,11 @@ export const selectGraphId = createSelector(
   (graphId) => graphId
 );
 
+export const selectEndorsementManifestURI = createSelector(
+  (state: RootState) => state.reputationGraph.metadata.endorsementManifestURI,
+  (uri) => uri
+);
+
 export const selectTopicScoreType = createSelector(
   [
     (state: RootState) => state.reputationGraph.graphTopicsMetadata,

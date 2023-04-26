@@ -8,8 +8,8 @@
   "openWallet": "Open wallet",
   "walletConnected": "Wallet connected!",
   "pleaseConnectYourWalletFirst": "Please connect your wallet. If you got issues with connecting your wallet, please use /reconnect",
-  "endorsementLinkMessage": "Welcome to Game of Trust. To access the bot, forward this message to someone inside Game of Trust so they can give you trust scores.\n\n{{endorsementLink}}",
-  "endorsementGuide": "You are endorsing {{userProfile}}.\nYour endorsement affects their access rights and their position within the group. Choose your answers carefully",
+  "profileLinkMessage": "Welcome to Game of Trust. To access the bot, forward this message to someone inside Game of Trust so they can give you trust scores.\n\n{{endorsementLink}}",
+  "endorsementGuide": "You are endorsing {{userProfile}}.\nYour endorsement affects their access rights and their position within the group. Please read the [Endorsement Guide]({{endorsementManifestLink}}) and choose your answers carefully",
   "cantEndorseYourself": "You can't endorse yourself. Please forward the endorsement link to someone else.",
   "endorsementActions": {
     "okGotIt": "Ok, got it!",
@@ -22,7 +22,7 @@
     "no": "No",
     "cancel": "Cancel"
   },
-  "confirmScoresSignature": "Please open your wallet application and confirm your endorsement",
+  "confirmSignature": "Please open your wallet application and confirm your request.",
   "signatureReconnectWalletHelpMessage": "\n\nIf you don't see the signature prompt on your wallet application, use /reconnect",
   "invalidValue": "Please enter a valid value",
   "howConfidentAreYouInYourAnswer": "How confident are you in your answer to the last question about this person?",
@@ -35,7 +35,7 @@
   "mainMenu": "What can I do for you?",
   "inviteToGroup": "Your invitation link:\n\n{{inviteLink}}",
   "getGroupInvitationLink": "Join group",
-  "getEndorsementLink": "Get my endorsement link",
+  "getProfileLink": "Get my endorsement link",
   "sendMessage": {
     "sendMessageInGroup": "Send message to the group",
     "commentOnThisPost": "Comment on this post",
