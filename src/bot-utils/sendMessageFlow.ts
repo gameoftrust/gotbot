@@ -88,6 +88,10 @@ export function getSendMessageTypedData(account: string, message: string) {
   return JSON.stringify(typedData);
 }
 
+export function containsLink(text: string) {
+  return text.includes("https://") || text.includes("http://")
+}
+
 export async function handleSendMessageFlow(
   ctx: TelegramBotContext,
   message: string | null
@@ -169,6 +173,7 @@ export async function handleSendMessageFlow(
         GROUP_ID,
         text, //[‌](https://www.google.com/${signature})
         {
+          disable_web_page_preview: !containsLink(message),
           reply_to_message_id: ctx.session.messageIdToReply,
           parse_mode: "Markdown",
         }

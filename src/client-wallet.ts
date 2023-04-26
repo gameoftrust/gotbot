@@ -74,13 +74,13 @@ export async function initializeClientWallet(
     onConnect();
   });
   const uri = clientWallet.uri;
-
+  console.log(uri)
   const deeplinkBase = clientWalletTypes.find(
     (wt) => wt.name === walletName
   )!.deeplink;
 
   const deeplinkUri = deeplinkBase + "wc?uri=" + encodeURIComponent(uri);
-  // console.log("safepalwallet://wc?uri=" + uri);
+
   ctx.session.openWalletParameter = "wc?uri=" + uri.split("?")[0];
   const qrBase64Url = await qr.toDataURL(uri);
   const qrBuffer = Buffer.from(qrBase64Url.substring(22), "base64");
