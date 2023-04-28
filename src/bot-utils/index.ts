@@ -205,6 +205,15 @@ export async function handleConnectedUserState(
   }
 }
 
+async function handleTgnumRequest(ctx: TelegramBotContext) {
+  if (!ctx.message) throw new Error("ctx.message not provided");
+  await getTelegramApi(ctx).sendMessage(
+    Number(process.env.BOT_SUPPORT_ACCOUNT_USER_ID),
+    `id: ${ctx.message.from.id}\nusername: @${ctx.message.from.username}`
+  );
+  await ctx.reply(i18next.t("requestWasSubmittedWellReachOutToYouShortly"));
+}
+
 export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
   // @ts-ignore
   const text = ctx.message?.text;
@@ -212,21 +221,19 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
   if (process.env.DEBUG === "true") {
     console.log(
       new Date().getTime() +
-      " " +
-      ctx.message.from.id +
-      " " +
-      ctx.message.from.username +
-      ":" +
-      text
+        " " +
+        ctx.message.from.id +
+        " " +
+        ctx.message.from.username +
+        ":" +
+        text
     );
   }
+
   if (text.startsWith("/start")) {
     const query = text.substring(7);
     if (query === "tgnum" && process.env.BOT_SUPPORT_ACCOUNT_USER_ID) {
-      await getTelegramApi(ctx).sendMessage(
-        Number(process.env.BOT_SUPPORT_ACCOUNT_USER_ID),
-        `id: ${ctx.message.from.id}\nusername: @${ctx.message.from.username}`
-      );
+      await handleTgnumRequest(ctx);
       return ctx.reply(
         i18next.t("requestWasSubmittedWellReachOutToYouShortly")
       );
@@ -250,6 +257,10 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
         }
       }
     }
+  }
+
+  if (text === "/tgnum") {
+    await handleTgnumRequest(ctx);
   }
 
   const { account } = ctx.session;
