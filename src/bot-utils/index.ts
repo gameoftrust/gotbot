@@ -234,9 +234,6 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
     const query = text.substring(7);
     if (query === "tgnum" && process.env.BOT_SUPPORT_ACCOUNT_USER_ID) {
       await handleTgnumRequest(ctx);
-      return ctx.reply(
-        i18next.t("requestWasSubmittedWellReachOutToYouShortly")
-      );
     } else {
       const params = query.split("-");
       for (const param of params) {
