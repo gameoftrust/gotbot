@@ -5,6 +5,7 @@ import {
   SEND_MESSAGE_SCENES,
   SET_NICKNAME_SCENES,
   TelegramBotContext,
+  VPN_SCENES,
 } from "../../types";
 import {
   chooseWallet,
@@ -27,6 +28,7 @@ import { getMessageScene, handleSendMessageFlow } from "./sendMessageFlow";
 import { GROUP_ID } from "../constants";
 import { handleSetNicknameFlow } from "./nicknameFlow";
 import { addressToRepresentation } from "../web3";
+import { handleVPNFlow } from "./VPNFlow";
 
 export function addressRepresentationWithLink(
   ctx: TelegramBotContext,
@@ -115,9 +117,8 @@ export function getMainMenuKeyboard() {
   return createKeyboard([
     [i18next.t("sendMessage.sendMessageInGroup")],
     [i18next.t("sendMessage.sendReplyOrComment")],
-    [i18next.t("getGroupInvitationLink")],
-    [i18next.t("getProfileLink")],
-    [i18next.t("nickname.setNickname")],
+    [i18next.t("getGroupInvitationLink"), "VPN"],
+    [i18next.t("nickname.setNickname"), i18next.t("getProfileLink")],
   ]);
 }
 
@@ -176,6 +177,13 @@ export async function handleConnectedUserState(
     (scene === Scene.INITIAL && message === i18next.t("nickname.setNickname"))
   ) {
     return handleSetNicknameFlow(ctx, message);
+  }
+
+  if (
+    VPN_SCENES.includes(scene) ||
+    (scene === Scene.INITIAL && message === "VPN")
+  ) {
+    return handleVPNFlow(ctx, message);
   }
 
   if (scene === Scene.INITIAL) {

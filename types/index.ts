@@ -30,6 +30,7 @@ export enum Scene {
   VIEW_USER,
   VIEW_RECEIVED_ENDORSEMENTS,
   SET_NICKNAME,
+  VPN_AGREEMENT,
 }
 
 export const SEND_MESSAGE_SCENES = [
@@ -38,6 +39,7 @@ export const SEND_MESSAGE_SCENES = [
 ];
 
 export const SET_NICKNAME_SCENES = [Scene.SET_NICKNAME];
+export const VPN_SCENES = [Scene.VPN_AGREEMENT];
 
 export type ScoreFromContract = ReturnType<
   ReputationGraph["methods"]["scores"]

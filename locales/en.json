@@ -35,7 +35,7 @@
   "mainMenu": "What can I do for you?",
   "inviteToGroup": "Your invitation link:\n\n{{inviteLink}}",
   "getGroupInvitationLink": "Join group",
-  "getProfileLink": "Get my endorsement link",
+  "getProfileLink": "My profile link",
   "sendMessage": {
     "sendMessageInGroup": "Send message to the group",
     "commentOnThisPost": "Comment on this post",
