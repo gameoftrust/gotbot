@@ -252,14 +252,6 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
     }
   }
 
-  const {
-    reputationGraph: { scoresLastFetchedTimestamp },
-  } = store.getState();
-
-  if (!scoresLastFetchedTimestamp) {
-    return sendBotNotLoadedMessage(ctx);
-  }
-
   const { account } = ctx.session;
   if (text.startsWith("/start")) {
     if (!account) {

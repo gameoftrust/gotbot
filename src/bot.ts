@@ -21,6 +21,8 @@ async function setupBot() {
   await Promise.all([
     store.dispatch(fetchReputationGraphMetadata()),
     store.dispatch(fetchGraphId()),
+    store.dispatch(fetchScores()),
+    store.dispatch(fetchNicknames())
   ]);
   await setupI18n();
 
@@ -35,8 +37,6 @@ async function setupBot() {
   });
   bot.launch();
 
-  store.dispatch(fetchScores());
-  store.dispatch(fetchNicknames());
   setInterval(() => {
     store.dispatch(fetchScores());
     store.dispatch(fetchNicknames());
