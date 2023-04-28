@@ -287,21 +287,21 @@ export type ValueMap = {
 
 export const getBinaryScoreValues = (): ValueMap => ({
   [i18next.t("endorsementActions.noIdea")]: null,
-  [i18next.t("endorsementActions.no")]: -3,
-  [i18next.t("endorsementActions.yes")]: 3,
+  [i18next.t("endorsementActions.no")]: -120,
+  [i18next.t("endorsementActions.yes")]: 120,
 });
 
 export const getSpectrumScoreValues = (): ValueMap => ({
   [i18next.t("endorsementActions.noIdea")]: null,
-  [i18next.t("endorsementActions.low")]: 0,
-  [i18next.t("endorsementActions.medium")]: 1,
-  [i18next.t("endorsementActions.high")]: 2,
-  [i18next.t("endorsementActions.very_high")]: 3,
+  [i18next.t("endorsementActions.low")]: 30,
+  [i18next.t("endorsementActions.medium")]: 60,
+  [i18next.t("endorsementActions.high")]: 90,
+  [i18next.t("endorsementActions.very_high")]: 120,
 });
 
 export const getOnlyYesScoreValues = (): ValueMap => ({
   [i18next.t("endorsementActions.noIdea")]: null,
-  [i18next.t("endorsementActions.yes")]: 3,
+  [i18next.t("endorsementActions.yes")]: 120,
 });
 
 export function getScoreValues(topicScoreType: TopicScoreType): ValueMap {
@@ -324,14 +324,14 @@ export const getConfidenceValues = (
     case TopicScoreType.SPECTRUM:
     case TopicScoreType.ONLY_CONFIDENCE:
       return {
-        [i18next.t("endorsementActions.low")]: 0,
-        [i18next.t("endorsementActions.medium")]: 1,
-        [i18next.t("endorsementActions.high")]: 2,
-        [i18next.t("endorsementActions.very_high")]: 3,
+        [i18next.t("endorsementActions.low")]: 30,
+        [i18next.t("endorsementActions.medium")]: 60,
+        [i18next.t("endorsementActions.high")]: 90,
+        [i18next.t("endorsementActions.very_high")]: 120,
       };
     case TopicScoreType.ONLY_SCORE_SPECTRUM:
       return {
-        [i18next.t("endorsementActions.very_high")]: 3,
+        [i18next.t("endorsementActions.very_high")]: 120,
       };
   }
 };
