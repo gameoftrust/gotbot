@@ -25,10 +25,11 @@ import { clientWalletTypes } from "../client-wallet";
 import { Markup } from "telegraf";
 import { handleViewUserFlow } from "./viewUserFlow";
 import { getMessageScene, handleSendMessageFlow } from "./sendMessageFlow";
-import { GROUP_ID } from "../constants";
+import { GOT_DEFAULT_CHAT_ID } from "../constants";
 import { handleSetNicknameFlow } from "./nicknameFlow";
 import { addressToRepresentation } from "../web3";
 import { handleVPNFlow } from "./VPNFlow";
+import { getChatTypeTranslationArg } from "../i18n";
 
 export function addressRepresentationWithLink(
   ctx: TelegramBotContext,
@@ -115,9 +116,9 @@ export async function sendUserProfileLink(ctx: TelegramBotContext) {
 
 export function getMainMenuKeyboard() {
   return createKeyboard([
-    [i18next.t("sendMessage.sendMessageInGroup")],
+    [i18next.t("sendMessage.sendMessageInChat", getChatTypeTranslationArg())],
     [i18next.t("sendMessage.sendReplyOrComment")],
-    [i18next.t("getGroupInvitationLink"), "VPN"],
+    [i18next.t("getChatInvitationLink", getChatTypeTranslationArg()), "VPN"],
     [i18next.t("nickname.setNickname"), i18next.t("getProfileLink")],
   ]);
 }
@@ -128,8 +129,8 @@ export function sendMainMenuMessage(ctx: TelegramBotContext) {
   });
 }
 
-export async function getGroupInvitationLink(ctx: TelegramBotContext) {
-  return getTelegramApi(ctx).createChatInviteLink(GROUP_ID, {
+export async function getChatInvitationLink(ctx: TelegramBotContext) {
+  return getTelegramApi(ctx).createChatInviteLink(GOT_DEFAULT_CHAT_ID, {
     member_limit: 1,
   });
 }
@@ -166,7 +167,11 @@ export async function handleConnectedUserState(
   if (
     SEND_MESSAGE_SCENES.includes(scene) ||
     (scene === Scene.INITIAL &&
-      (message === i18next.t("sendMessage.sendMessageInGroup") ||
+      (message ===
+        i18next.t(
+          "sendMessage.sendMessageInChat",
+          getChatTypeTranslationArg()
+        ) ||
         message === i18next.t("sendMessage.sendReplyOrComment")))
   ) {
     return handleSendMessageFlow(ctx, message);
@@ -187,13 +192,17 @@ export async function handleConnectedUserState(
   }
 
   if (scene === Scene.INITIAL) {
-    if (message === i18next.t("getGroupInvitationLink")) {
+    if (
+      message ===
+      i18next.t("getChatInvitationLink", getChatTypeTranslationArg())
+    ) {
       if (canAccessGroup(account)) {
         try {
-          const inviteLink = await getGroupInvitationLink(ctx);
+          const inviteLink = await getChatInvitationLink(ctx);
           await ctx.reply(
-            i18next.t("inviteToGroup", {
+            i18next.t("inviteToChat", {
               inviteLink: inviteLink.invite_link,
+              ...getChatTypeTranslationArg(),
             })
           );
           return sendMainMenuMessage(ctx);
@@ -313,7 +322,7 @@ export async function handleMessage(ctx: TelegramBotContext) {
   const messageType = ctx.message.chat.type;
   if (messageType === "private") {
     return handlePrivateTextMessage(ctx);
-  } else if (String(ctx.message.chat.id) === GROUP_ID) {
+  } else if (String(ctx.message.chat.id) === GOT_DEFAULT_CHAT_ID) {
     // @ts-ignore
     if (ctx.message.is_automatic_forward) {
       return ctx.reply(

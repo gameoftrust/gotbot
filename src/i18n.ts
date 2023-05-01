@@ -4,6 +4,7 @@ import translationFa from "../locales/fa.json";
 import translationEn from "../locales/en.json";
 import { store } from "./store";
 import { GraphTopicsMetadata, TopicId, TopicMetadata } from "../types";
+import { selectDefaultChatInfo } from "./store/gotChatInfo/selectors";
 
 //TODO: add _md to translation items that should be in markdown format
 
@@ -80,4 +81,11 @@ export async function setupI18n() {
       },
     },
   });
+}
+
+export function getChatTypeTranslationArg() {
+  const { type } = selectDefaultChatInfo(store.getState());
+  return {
+    chatType: i18next.t("chatTypes." + type),
+  };
 }

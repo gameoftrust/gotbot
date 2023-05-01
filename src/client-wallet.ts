@@ -8,7 +8,7 @@ import qr from "qrcode";
 import { Markup } from "telegraf";
 import { getSession } from "./session-utils";
 import i18next from "i18next";
-import {createKeyboard, replyMarkupArguments} from "./bot-utils";
+import { replyMarkupArguments } from "./bot-utils";
 import { v4 as uuidv4 } from "uuid";
 import { addWalletConnection } from "./store/walletConnections";
 import { store } from "./store";
@@ -74,7 +74,6 @@ export async function initializeClientWallet(
     onConnect();
   });
   const uri = clientWallet.uri;
-  console.log(uri)
   const deeplinkBase = clientWalletTypes.find(
     (wt) => wt.name === walletName
   )!.deeplink;

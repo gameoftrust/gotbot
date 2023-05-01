@@ -1,7 +1,7 @@
-if (process.env.GROUP_ID === undefined) {
-  throw new Error("Please provide the GROUP_ID in .env file");
+if (process.env.GOT_DEFAULT_CHAT_ID === undefined) {
+  throw new Error("Please provide the GOT_DEFAULT_CHAT_ID in .env file");
 }
-const GROUP_ID = process.env.GROUP_ID;
+const GOT_DEFAULT_CHAT_ID = process.env.GOT_DEFAULT_CHAT_ID || "";
 const EXPLORER_URL = process.env.BLOCKCHAIN_EXPLORER_URL;
 
-export { GROUP_ID, EXPLORER_URL };
+export { GOT_DEFAULT_CHAT_ID, EXPLORER_URL };

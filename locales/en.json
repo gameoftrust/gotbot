@@ -33,17 +33,17 @@
   "txError": "There was an error while submitting the request. More details:",
   "signatureAccepted": "Signature was received! Submitting the request on the blockchain...",
   "mainMenu": "What can I do for you?",
-  "inviteToGroup": "Your invitation link:\n\n{{inviteLink}}",
-  "getGroupInvitationLink": "Join group",
+  "inviteToChat": "Your invitation link:\n\n{{inviteLink}}",
+  "getChatInvitationLink": "Join {{chatType}}",
   "getProfileLink": "My profile link",
   "sendMessage": {
-    "sendMessageInGroup": "Send message to the group",
+    "sendMessageInChat": "Send message to the {{chatType}}",
     "commentOnThisPost": "Comment on this post",
     "isReplyToAnotherMessage": "Would you like to reply or comment on another message?",
     "sendReplyOrComment": "Reply / Comment on another message",
-    "sendReplyMessageLink": "Copy and paste the link of the message you want to reply to [in the group]({{groupLink}}) here.",
+    "sendReplyMessageLink": "Copy and paste the link of the message you want to reply to [in the {{chatType}}]({{chatLink}}) here.",
     "commentOnChannelMessageHelp": "\n\nTo comment on a post in a channel, copy the link of its discussion message from either the discussion group or the post's comments thread in the channel.",
-    "invalidReplyMessageChat": "Invalid link. The message should be from the group {{groupName}}. Please send a valid link.",
+    "invalidReplyMessageChat": "Invalid link. The message should be from the {{chatType}} {{chatName}}. Please send a valid link.",
     "enterTextMessage": "Please send your message",
     "confirmTextMessageSignature": "Please open your wallet application and confirm your message",
     "longMessageError": "You're message is too long, please write a shorter message",
@@ -84,5 +84,11 @@
     "nicknameSubmitted": "Your nickname was submitted successfully\\!",
     "nicknamePrivacyWarning": "⚠️ *Notice:* This nickname is public on the blockchain, so please enter a nickname that you don't use anywhere else and does not reveal your identity.\n\nRevealing your identity can put the privacy of you and the accounts that are connected to you at risk, so choose your nickname wisely.",
     "enterYourNickname": "Enter your nickname"
+  },
+  "chatTypes": {
+    "group": "Group",
+    "private": "Private Chat",
+    "supergroup": "Group",
+    "channel": "Channel"
   }
 }

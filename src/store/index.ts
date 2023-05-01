@@ -7,27 +7,30 @@ import {
   walletConnectionsSlice,
   WalletConnectionsState,
 } from "./walletConnections";
+import { gotChatInfosSlice, GotChatInfosState } from "./gotChatInfo";
 
 export type RootState = {
   reputationGraph: ReputationGraphState;
   nicknames: NicknamesState;
   walletConnections: WalletConnectionsState;
+  gotChatInfos: GotChatInfosState;
 };
 
-if (process.env.REDUX_PERSISTANT_STORAGE_FOLDER === undefined) {
+if (process.env.REDUX_PERSISTENT_STORAGE_FOLDER === undefined) {
   throw new Error(
-    "Please provide the REDUX_PERSISTANT_STORAGE_FOLDER in .env file"
+    "Please provide the REDUX_PERSISTENT_STORAGE_FOLDER in .env file"
   );
 }
 
 const persistConfig = {
   key: "root",
-  storage: new AsyncNodeStorage(process.env.REDUX_PERSISTANT_STORAGE_FOLDER),
+  storage: new AsyncNodeStorage(process.env.REDUX_PERSISTENT_STORAGE_FOLDER),
 };
 
 const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
+    gotChatInfos: gotChatInfosSlice.reducer,
     reputationGraph: reputationGraphSlice.reducer,
     nicknames: nicknamesSlice.reducer,
     walletConnections: walletConnectionsSlice.reducer,

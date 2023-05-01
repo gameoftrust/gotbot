@@ -10,13 +10,16 @@ import {
   addressRepresentationWithLink,
   canAccessGroup,
   createKeyboard,
-  getGroupInvitationLink,
+  getChatInvitationLink,
   getTelegramApi,
   replyMarkupArguments,
   sendMainMenuMessage,
   sendUserProfileLink,
 } from "./index";
-import { GROUP_ID } from "../constants";
+import { GOT_DEFAULT_CHAT_ID } from "../constants";
+import { selectDefaultChatInfo } from "../store/gotChatInfo/selectors";
+import { store } from "../store";
+import { getChatTypeTranslationArg } from "../i18n";
 
 function initialSendMessageScene(ctx: TelegramBotContext) {
   return ctx.reply(i18next.t("sendMessage.isReplyToAnotherMessage"), {
@@ -31,19 +34,20 @@ function initialSendMessageScene(ctx: TelegramBotContext) {
 }
 
 async function getReplyMessageScene(ctx: TelegramBotContext) {
-  let isDiscussionGroup = true;
-  let groupLink = "";
+  let chatLink = "";
   try {
-    groupLink = (await getGroupInvitationLink(ctx)).invite_link;
-    const gpInfo = await getTelegramApi(ctx).getChat(GROUP_ID);
-    // @ts-ignore
-    isDiscussionGroup = !!gpInfo.linked_chat_id;
+    chatLink = (await getChatInvitationLink(ctx)).invite_link;
   } catch (e) {
     console.log(e);
   }
+  const chatInfo = selectDefaultChatInfo(store.getState());
+  const isDiscussionGroup = !!(
+    "linked_chat_id" in chatInfo && chatInfo.linked_chat_id
+  );
   return ctx.reply(
     i18next.t("sendMessage.sendReplyMessageLink", {
-      groupLink,
+      chatLink,
+      ...getChatTypeTranslationArg(),
     }) +
       (isDiscussionGroup
         ? i18next.t("sendMessage.commentOnChannelMessageHelp")
@@ -89,7 +93,7 @@ export function getSendMessageTypedData(account: string, message: string) {
 }
 
 export function containsLink(text: string) {
-  return text.includes("https://") || text.includes("http://")
+  return text.includes("https://") || text.includes("http://");
 }
 
 export async function handleSendMessageFlow(
@@ -101,7 +105,10 @@ export async function handleSendMessageFlow(
 
   if (scene === Scene.INITIAL) {
     if (canAccessGroup(account)) {
-      if (message === i18next.t("sendMessage.sendMessageInGroup")) {
+      if (
+        message ===
+        i18next.t("sendMessage.sendMessageInChat", getChatTypeTranslationArg())
+      ) {
         ctx.session.scene = Scene.SEND_MESSAGE_TO_GROUP_GET_MESSAGE;
         return getMessageScene(ctx);
       } else if (message === i18next.t("sendMessage.sendReplyOrComment")) {
@@ -122,18 +129,13 @@ export async function handleSendMessageFlow(
   if (scene === Scene.SEND_MESSAGE_TO_GROUP_GET_REPLY_MESSAGE) {
     if (message) {
       const [msgId, chatId] = message.split("/").reverse();
-      if (!GROUP_ID.endsWith(chatId) || !msgId) {
-        let groupName = "";
-        try {
-          const gpInfo = await getTelegramApi(ctx).getChat(GROUP_ID);
-          // @ts-ignore
-          groupName = gpInfo.title;
-        } catch (e) {
-          console.log(e);
-        }
+      if (!GOT_DEFAULT_CHAT_ID.endsWith(chatId) || !msgId) {
+        const chatInfo = selectDefaultChatInfo(store.getState());
+        const chatName = "title" in chatInfo ? chatInfo.title : "";
         return ctx.reply(
           i18next.t("sendMessage.invalidReplyMessageChat", {
-            groupName,
+            chatName,
+            ...getChatTypeTranslationArg(),
           }),
           {
             ...replyMarkupArguments(createKeyboard([[i18next.t("cancel")]])),
@@ -170,7 +172,7 @@ export async function handleSendMessageFlow(
     )}`;
     try {
       const res = await getTelegramApi(ctx).sendMessage(
-        GROUP_ID,
+        GOT_DEFAULT_CHAT_ID,
         text, //[‌](https://www.google.com/${signature})
         {
           disable_web_page_preview: !containsLink(message),
@@ -178,11 +180,11 @@ export async function handleSendMessageFlow(
           parse_mode: "Markdown",
         }
       );
-      const gpInfo = await getTelegramApi(ctx).getChat(GROUP_ID);
-      // @ts-ignore
-      const isForum = !!gpInfo.is_forum;
+      const chatInfo = selectDefaultChatInfo(store.getState());
+      const isForum = !!("is_forum" in chatInfo && chatInfo.is_forum);
       const baseLink =
-        `https://t.me/c/${GROUP_ID.substring(4)}/` + (isForum ? "1/" : "");
+        `https://t.me/c/${GOT_DEFAULT_CHAT_ID.substring(4)}/` +
+        (isForum ? "1/" : "");
       await ctx.reply(
         i18next.t("sendMessage.messageWasSentSuccessfully", {
           messageLink: baseLink + res.message_id,

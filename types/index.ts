@@ -9,6 +9,7 @@ import {
   TOPIC_QUESTION_TRANSLATION_KEY,
   TOPIC_TITLE_TRANSLATION_KEY,
 } from "../src/i18n";
+import { ChatFromGetChat } from "telegraf/types";
 
 export type ReplyKeyboardMarkup = Markup.Markup<ReplyKeyboardMarkupType>;
 
@@ -142,3 +143,5 @@ export type WalletConnection = {
   accountHash: string;
   timestamp: number;
 };
+
+export type ChatInfo = ChatFromGetChat;

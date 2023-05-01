@@ -15,7 +15,7 @@ import {
   addressRepresentationWithLink,
   canAccessBot,
   createKeyboard,
-  getGroupInvitationLink,
+  getChatInvitationLink,
   getMainMenuKeyboard,
   getTelegramApi,
   replyMarkupArguments,
@@ -41,6 +41,7 @@ import { selectAccountHashLastConnection } from "./store/walletConnections/selec
 import { keccak256 } from "@ethersproject/keccak256";
 import * as fs from "fs";
 import { EXPLORER_URL } from "./constants";
+import { getChatTypeTranslationArg } from "./i18n";
 
 export const getInitialDraftScores = () => {
   const questionTopicIds = selectQuestionTopicIds(store.getState());
@@ -166,11 +167,12 @@ export async function handleAfterEndorsement(ctx: TelegramBotContext) {
       ctx.session.userToEndorseCanAccessGroupBeforeEndorsement === false &&
       canAccessBot(userToEndorse)
     ) {
-      const inviteLink = await getGroupInvitationLink(ctx);
+      const inviteLink = await getChatInvitationLink(ctx);
       await getTelegramApi(ctx).sendMessage(
         walletConnection.userId,
-        i18next.t("inviteToGroup", {
+        i18next.t("inviteToChat", {
           inviteLink: inviteLink.invite_link,
+          ...getChatTypeTranslationArg(),
         }),
         {
           disable_web_page_preview: true,
@@ -254,16 +256,16 @@ export async function submitEndorsement(ctx: TelegramBotContext) {
       await handleAfterEndorsement(ctx);
       const txLink = EXPLORER_URL
         ? "\n\n" +
-        i18next.t("transactionExplorerLink", {
-          txLink: `${EXPLORER_URL}/tx/${tx.transactionHash}`,
-        })
+          i18next.t("transactionExplorerLink", {
+            txLink: `${EXPLORER_URL}/tx/${tx.transactionHash}`,
+          })
         : "";
       await ctx.reply(i18next.t("endorsementSubmitted") + txLink, {
         parse_mode: "MarkdownV2",
       });
       if (
         process.env.SEND_TWO_SIDED_ENDORSEMENT_MESSAGE_AFTER_ENDORSEMENT ===
-        "true" &&
+          "true" &&
         !selectIsEvaluatedBy(store.getState(), [userToEndorse, account])
       ) {
         await ctx.reply(
