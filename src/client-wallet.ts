@@ -67,7 +67,7 @@ export async function initializeClientWallet(
       addWalletConnection({
         accountHash: keccak256(newAccount.toLowerCase()),
         timestamp: Date.now(),
-        userId: ctx.message!.chat.id,
+        chatId: ctx.message!.chat.id,
       })
     );
     ctx.session.clientWallet = clientWallet;

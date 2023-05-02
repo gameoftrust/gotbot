@@ -193,8 +193,7 @@ export async function handleSendMessageFlow(
           parse_mode: "Markdown",
         }
       );
-    } catch (e) {
-      // @ts-ignore
+    } catch (e: any) {
       if (e?.description === "Bad Request: message is too long") {
         return ctx.reply(i18next.t("sendMessage.longMessageError"));
       }

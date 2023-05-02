@@ -6,8 +6,8 @@ import { handleEndorsementFlow, setUserToEndorse } from "./endorsementFlow";
 import {
   createKeyboard,
   findMainTopicEndorsementPath,
+  handleConnectedUserState,
   replyMarkupArguments,
-  sendMainMenuMessage,
 } from "./index";
 import {
   ENDORSED_ON_TOPIC_TRANSLATION_KEY,
@@ -200,12 +200,12 @@ export async function handleViewUserFlow(
   if (isTheSameAddress(account, userToView)) {
     resetSession(ctx);
     await ctx.reply(i18next.t("viewProfile.viewProfileSelf"));
-    return sendMainMenuMessage(ctx);
+    return handleConnectedUserState(ctx);
   }
 
   if (message === i18next.t("returnToMainMenu")) {
     resetSession(ctx);
-    return sendMainMenuMessage(ctx);
+    return handleConnectedUserState(ctx);
   }
 
   if (scene === Scene.VIEW_RECEIVED_ENDORSEMENTS) {

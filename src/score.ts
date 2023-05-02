@@ -153,7 +153,7 @@ export async function handleAfterEndorsement(ctx: TelegramBotContext) {
     if (!walletConnection) return;
     if (!selectIsEvaluatedBy(store.getState(), [userToEndorse, account])) {
       await getTelegramApi(ctx).sendMessage(
-        walletConnection.userId,
+        walletConnection.chatId,
         i18next.t("endorseTheEndorserMessage", {
           userProfile: addressRepresentationWithLink(ctx, account, false),
           endorsementLink: getViewProfileLink(ctx, account),
@@ -169,7 +169,7 @@ export async function handleAfterEndorsement(ctx: TelegramBotContext) {
     ) {
       const inviteLink = await getChatInvitationLink(ctx);
       await getTelegramApi(ctx).sendMessage(
-        walletConnection.userId,
+        walletConnection.chatId,
         i18next.t("inviteToChat", {
           inviteLink: inviteLink.invite_link,
           ...getChatTypeTranslationArg(),
@@ -179,7 +179,7 @@ export async function handleAfterEndorsement(ctx: TelegramBotContext) {
         }
       );
       await getTelegramApi(ctx).sendMessage(
-        walletConnection.userId,
+        walletConnection.chatId,
         i18next.t("mainMenu"), //[‌](https://www.google.com/${signatue})
         {
           ...replyMarkupArguments(getMainMenuKeyboard()),

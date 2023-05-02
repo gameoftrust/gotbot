@@ -139,7 +139,7 @@ export type TopicMetadata = {
 export type GraphTopicsMetadata = { [topicId: TopicId]: TopicMetadata };
 
 export type WalletConnection = {
-  userId: number;
+  chatId: number;
   accountHash: string;
   timestamp: number;
 };

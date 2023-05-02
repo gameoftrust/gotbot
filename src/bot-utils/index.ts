@@ -25,7 +25,7 @@ import { clientWalletTypes } from "../client-wallet";
 import { Markup } from "telegraf";
 import { handleViewUserFlow } from "./viewUserFlow";
 import { getMessageScene, handleSendMessageFlow } from "./sendMessageFlow";
-import { GOT_DEFAULT_CHAT_ID } from "../constants";
+import { DEBUG, GOT_DEFAULT_CHAT_ID } from "../constants";
 import { handleSetNicknameFlow } from "./nicknameFlow";
 import { addressToRepresentation } from "../web3";
 import { handleVPNFlow } from "./VPNFlow";
@@ -226,32 +226,41 @@ async function handleTgnumRequest(ctx: TelegramBotContext) {
   if (!ctx.message) throw new Error("ctx.message not provided");
   await getTelegramApi(ctx).sendMessage(
     Number(process.env.BOT_SUPPORT_ACCOUNT_USER_ID),
-    `id: ${ctx.message.from.id}\nusername: @${ctx.message.from.username}`
+    `id: ${ctx.message.chat.id}\nusername: @${ctx.message.from.username}`
   );
   await ctx.reply(i18next.t("requestWasSubmittedWellReachOutToYouShortly"));
 }
 
 export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
-  // @ts-ignore
-  const text = ctx.message?.text;
-  if (!text) return;
-  if (process.env.DEBUG === "true") {
-    console.log(
-      new Date().getTime() +
-        " " +
-        ctx.message.from.id +
-        " " +
-        ctx.message.from.username +
-        ":" +
-        text
-    );
+  let text = ctx.message && "text" in ctx.message ? ctx.message.text : null;
+  if (!text) {
+    console.log(getBotInfo(ctx).id);
+    if (
+      ctx.message &&
+      "new_chat_members" in ctx.message &&
+      ctx.message.new_chat_members.find((u) => u.id === getBotInfo(ctx).id)
+    ) {
+      text = "/start";
+    } else {
+      return;
+    }
+  }
+  const botStartLinkParams = text.split(
+    `https://t.me/${getBotInfo(ctx).username}?start=`
+  )[1];
+  if (botStartLinkParams) {
+    text = "/start " + botStartLinkParams;
+  }
+
+  if (DEBUG) {
+    console.log(new Date().getTime() + " " + ctx.chat?.id + ":" + text);
   }
 
   if (text.startsWith("/start")) {
-    const query = text.substring(7);
+    const query = text.split(" ")[1];
     if (query === "tgnum" && process.env.BOT_SUPPORT_ACCOUNT_USER_ID) {
       await handleTgnumRequest(ctx);
-    } else {
+    } else if (query) {
       const params = query.split("-");
       for (const param of params) {
         const [key, value] = param.split("=");
@@ -266,14 +275,14 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
         if (key === ParameterKey.REPLY) {
           resetSession(ctx);
           ctx.session.scene = Scene.SEND_MESSAGE_TO_GROUP_GET_MESSAGE;
-          ctx.session.messageIdToReply = value;
+          ctx.session.messageIdToReply = Number(value);
           return getMessageScene(ctx);
         }
       }
     }
   }
 
-  if (text === "/tgnum") {
+  if (text.startsWith("/tgnum")) {
     await handleTgnumRequest(ctx);
   }
 
@@ -284,7 +293,7 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
     }
   }
 
-  if (text === "/reset") {
+  if (text.startsWith("/reset")) {
     return resetStateAndSendChooseWalletMessage(ctx);
   }
 
@@ -297,7 +306,7 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
     }
   }
 
-  if (text === "/reconnect") {
+  if (text.startsWith("/reconnect")) {
     return setupWallet(ctx, ctx.session.walletName);
   }
 
@@ -319,12 +328,11 @@ export function getReplyLink(
 
 export async function handleMessage(ctx: TelegramBotContext) {
   if (!ctx.message) return;
-  const messageType = ctx.message.chat.type;
-  if (messageType === "private") {
-    return handlePrivateTextMessage(ctx);
-  } else if (String(ctx.message.chat.id) === GOT_DEFAULT_CHAT_ID) {
-    // @ts-ignore
-    if (ctx.message.is_automatic_forward) {
+  if (String(ctx.message.chat.id) === GOT_DEFAULT_CHAT_ID) {
+    if (
+      "is_automatic_forward" in ctx.message &&
+      ctx.message.is_automatic_forward
+    ) {
       return ctx.reply(
         `[${i18next.t("sendMessage.commentOnThisPost")}](${getReplyLink(
           ctx,
@@ -337,4 +345,5 @@ export async function handleMessage(ctx: TelegramBotContext) {
       );
     }
   }
+  return handlePrivateTextMessage(ctx);
 }

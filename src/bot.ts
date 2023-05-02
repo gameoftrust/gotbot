@@ -29,14 +29,13 @@ async function setupBot() {
     store.dispatch(getChatInfo({ bot, chatId: GOT_DEFAULT_CHAT_ID })),
   ]);
   await setupI18n();
-
   bot.use(session());
   bot.on("message", async (ctx) => {
     handleMessage(
       Object.assign(ctx, {
         session: ctx.session ?? getInitialState(),
       })
-    );
+    ).catch(console.log);
   });
   bot.launch();
 
