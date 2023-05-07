@@ -144,14 +144,6 @@ export async function handleConnectedUserState(
   if (!account) throw new Error("account not provided");
   if (!walletName) throw new Error("walletName not provided");
 
-  if (userToEndorse) {
-    return handleEndorsementFlow(ctx, message);
-  }
-
-  if (userToView) {
-    return handleViewUserFlow(ctx, message);
-  }
-
   if (!canAccessBot(account)) {
     if (message === i18next.t("checkAgain")) {
       await ctx.reply(i18next.t("notEndorsedYet"));
@@ -162,6 +154,18 @@ export async function handleConnectedUserState(
     //   ...replyMarkupArguments(createKeyboard([[i18next.t("checkAgain")]])),
     //   parse_mode: "Markdown",
     // });
+  }
+
+  if (message?.startsWith("/vnum") && process.env.VIRTUAL_NUMBER_MESSAGE) {
+    await ctx.reply(process.env.VIRTUAL_NUMBER_MESSAGE);
+  }
+
+  if (userToEndorse) {
+    return handleEndorsementFlow(ctx, message);
+  }
+
+  if (userToView) {
+    return handleViewUserFlow(ctx, message);
   }
 
   if (
@@ -222,15 +226,6 @@ export async function handleConnectedUserState(
   }
 }
 
-async function handleTgnumRequest(ctx: TelegramBotContext) {
-  if (!ctx.message) throw new Error("ctx.message not provided");
-  await getTelegramApi(ctx).sendMessage(
-    Number(process.env.BOT_SUPPORT_ACCOUNT_USER_ID),
-    `id: ${ctx.message.chat.id}\nusername: @${ctx.message.from.username}`
-  );
-  await ctx.reply(i18next.t("requestWasSubmittedWellReachOutToYouShortly"));
-}
-
 export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
   let text = ctx.message && "text" in ctx.message ? ctx.message.text : null;
   if (!text) {
@@ -258,9 +253,7 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
 
   if (text.startsWith("/start")) {
     const query = text.split(" ")[1];
-    if (query === "tgnum" && process.env.BOT_SUPPORT_ACCOUNT_USER_ID) {
-      await handleTgnumRequest(ctx);
-    } else if (query) {
+    if (query) {
       const params = query.split("-");
       for (const param of params) {
         const [key, value] = param.split("=");
@@ -280,10 +273,6 @@ export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
         }
       }
     }
-  }
-
-  if (text.startsWith("/tgnum")) {
-    await handleTgnumRequest(ctx);
   }
 
   const { account } = ctx.session;
