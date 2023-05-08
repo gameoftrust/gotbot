@@ -407,26 +407,27 @@ export async function scoreToRepresentation(
   const scoreType = selectTopicScoreType(store.getState(), score.topicId);
 
   const scoreValues = getScoreValues(scoreType);
+  const scoreValue = Object.keys(scoreValues).find(
+    (s) => scoreValues[s] === Number(score.score)
+  );
+
   const confidenceValues = getConfidenceValues(scoreType);
+  const confidenceValue = Object.keys(confidenceValues).find(
+    (s) => confidenceValues[s] === Number(score.confidence)
+  );
 
-  const scoreString =
-    i18next.t("score") +
-    ": " +
-    Object.keys(scoreValues).find(
-      (s) => scoreValues[s] === Number(score.score)
-    );
-  const confidenceString =
-    i18next.t("confidenceInScore") +
-    ": " +
-    Object.keys(confidenceValues).find(
-      (s) => confidenceValues[s] === Number(score.confidence)
-    );
-
+  const scoreString = scoreValue
+    ? i18next.t("score") + ": " + scoreValue
+    : undefined;
+  const confidenceString = confidenceValue
+    ? i18next.t("confidenceInScore") + ": " + confidenceValue
+    : undefined;
   if (scoreType === TopicScoreType.ONLY_SCORE_SPECTRUM) {
     return scoreString;
   } else if (scoreType === TopicScoreType.ONLY_CONFIDENCE) {
     return confidenceString;
   }
+  if (!scoreString || !confidenceString) return undefined;
   return scoreString + "\n" + confidenceString;
 }
 

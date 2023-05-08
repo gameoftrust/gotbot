@@ -150,9 +150,12 @@ async function viewUserProfileEndorsementsOnTopic(ctx: TelegramBotContext) {
   for (let i = 0; i < endorsementsReceivedDirectlyByThisPerson.length; i++) {
     const score = endorsementsReceivedDirectlyByThisPerson[i];
     const sourceString = await scoreSourceRepresentation(ctx, score);
-    endorsementsReceivedRepresentations.push(
-      sourceString + "\n" + (await scoreToRepresentation(ctx, score))
-    );
+    const scoreRepresentation = await scoreToRepresentation(ctx, score);
+    if (scoreRepresentation) {
+      endorsementsReceivedRepresentations.push(
+        sourceString + "\n" + scoreRepresentation
+      );
+    }
   }
   const endorsementsReceivedString = `${i18next.t(
     "viewProfile.endorsementsReceivedDirectlyByThisPerson"
