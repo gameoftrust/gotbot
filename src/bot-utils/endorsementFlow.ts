@@ -2,7 +2,6 @@ import {
   ParameterKey,
   Scene,
   TelegramBotContext,
-  TopicId,
   TopicScoreType,
 } from "../../types";
 import { getSession, resetSession } from "../session-utils";
@@ -15,7 +14,7 @@ import {
   scoreKeyboards,
   submitEndorsement,
 } from "../score";
-import { openWalletButton } from "../client-wallet";
+import { sendConfirmSignatureMessage } from "../client-wallet";
 import {
   canAccessBot,
   createKeyboard,
@@ -23,10 +22,7 @@ import {
   handleConnectedUserState,
   replyMarkupArguments,
 } from "./index";
-import {
-  TOPIC_QUESTION_TRANSLATION_KEY,
-  TOPICS_TRANSLATION_PREFIX,
-} from "../i18n";
+import { getTopicQuestion } from "../i18n";
 import { store } from "../store";
 import {
   selectEndorsementManifestURI,
@@ -44,26 +40,6 @@ export function setUserToEndorse(
     canAccessBot(userToEndorse);
 }
 
-export async function sendTopicQuestion(
-  ctx: TelegramBotContext,
-  topicId: TopicId
-) {
-  const scoreType = selectTopicScoreType(store.getState(), topicId);
-  return ctx.reply(
-    i18next.t(
-      TOPICS_TRANSLATION_PREFIX +
-        "." +
-        topicId +
-        "." +
-        TOPIC_QUESTION_TRANSLATION_KEY
-    ),
-    {
-      parse_mode: "Markdown",
-      ...replyMarkupArguments(scoreKeyboards[scoreType]()),
-    }
-  );
-}
-
 export function getViewProfileLink(ctx: TelegramBotContext, address: string) {
   return `https://t.me/${getBotInfo(ctx).username}?start=${
     ParameterKey.VIEW_USER
@@ -76,9 +52,67 @@ export function getProfileLink(ctx: TelegramBotContext, address: string) {
   }=${address}`;
 }
 
-export function finishOrCancelEndorsementFlow(ctx: TelegramBotContext) {
+export function finishEndorsementFlow(ctx: TelegramBotContext) {
   resetSession(ctx);
   return handleConnectedUserState(ctx);
+}
+
+export function getLastUnansweredQuestionTopicIndex(ctx: TelegramBotContext) {
+  const { draftScores } = getSession(ctx);
+  const questionTopicIds = selectQuestionTopicIds(store.getState());
+  let i = 0;
+  while (i < questionTopicIds.length) {
+    const topicId = questionTopicIds[i];
+    const scoreIsNotSet = draftScores[topicId].score === undefined;
+    if (scoreIsNotSet) break;
+    const scoreIsNotNoIdea = draftScores[topicId].score !== null;
+    const confidenceIsNotSet =
+      scoreIsNotNoIdea && draftScores[topicId].confidence === undefined;
+    if (confidenceIsNotSet) break;
+    i++;
+  }
+  return i;
+}
+
+const keyboardBottomRowCancel = () => [i18next.t("endorsementActions.cancel")];
+const keyboardBottomRowCancelAndPreviousQuestion = () => [
+  i18next.t("endorsementActions.cancel"),
+  i18next.t("endorsementActions.previousQuestion"),
+];
+
+export async function handleEndorsementFlowNextAction(ctx: TelegramBotContext) {
+  const { draftScores } = getSession(ctx);
+  const state = store.getState();
+  const questionTopicIds = selectQuestionTopicIds(state);
+  const i = getLastUnansweredQuestionTopicIndex(ctx);
+  if (i < questionTopicIds.length) {
+    const topicId = questionTopicIds[i];
+    const draftScore = draftScores[topicId];
+    const keyboardBottomRow: string[] =
+      i === 0 && draftScore.score === undefined
+        ? keyboardBottomRowCancel()
+        : keyboardBottomRowCancelAndPreviousQuestion();
+    if (draftScore.score === undefined) {
+      const scoreType = selectTopicScoreType(state, topicId);
+      return ctx.reply(getTopicQuestion(topicId), {
+        parse_mode: "Markdown",
+        ...replyMarkupArguments(
+          createKeyboard([...scoreKeyboards[scoreType](), keyboardBottomRow])
+        ),
+      });
+    } else {
+      return ctx.reply(i18next.t("howConfidentAreYouInYourAnswer"), {
+        ...replyMarkupArguments(
+          createKeyboard([
+            ...confidenceKeyboard(),
+            keyboardBottomRowCancelAndPreviousQuestion(),
+          ])
+        ),
+      });
+    }
+  } else {
+    return submitEndorsement(ctx);
+  }
 }
 
 export async function handleEndorsementFlow(
@@ -97,17 +131,30 @@ export async function handleEndorsementFlow(
 
   if (account === userToEndorse) {
     await ctx.reply(i18next.t("cantEndorseYourself"));
-    return finishOrCancelEndorsementFlow(ctx);
+    return finishEndorsementFlow(ctx);
   }
 
   if (message === i18next.t("endorsementActions.cancel")) {
-    return finishOrCancelEndorsementFlow(ctx);
+    const u = session.userToView;
+    resetSession(ctx);
+    ctx.session.userToView = u;
+    return handleConnectedUserState(ctx);
   }
 
   if (scene === Scene.INITIAL) {
     if (message === i18next.t("endorsementActions.okGotIt")) {
       ctx.session.scene = Scene.ENDORSEMENT;
-      return sendTopicQuestion(ctx, questionTopicIds[0]);
+      const topicId = questionTopicIds[0];
+      const scoreType = selectTopicScoreType(state, topicId);
+      return ctx.reply(getTopicQuestion(topicId), {
+        parse_mode: "Markdown",
+        ...replyMarkupArguments(
+          createKeyboard([
+            ...scoreKeyboards[scoreType](),
+            keyboardBottomRowCancel(),
+          ])
+        ),
+      });
     }
     return ctx.reply(
       i18next.t("endorsementGuide", {
@@ -126,25 +173,32 @@ export async function handleEndorsementFlow(
     );
   }
 
-  let i = 0;
-  while (i < questionTopicIds.length) {
-    const topicId = questionTopicIds[i];
-    const scoreIsNotSet = draftScores[topicId].score === undefined;
-    if (scoreIsNotSet) break;
-    const scoreIsNotNoIdea = draftScores[topicId].score !== null;
-    const confidenceIsNotSet =
-      scoreIsNotNoIdea && draftScores[topicId].confidence === undefined;
-    if (confidenceIsNotSet) break;
-    i++;
-  }
+  const index = getLastUnansweredQuestionTopicIndex(ctx);
   if (message) {
-    if (i === questionTopicIds.length)
-      return ctx.reply(i18next.t("confirmSignature"), {
-        ...replyMarkupArguments(openWalletButton(ctx)),
-      });
-    const topicId = questionTopicIds[i];
-    const scoreType = selectTopicScoreType(state, topicId);
+    if (index === questionTopicIds.length) {
+      return sendConfirmSignatureMessage(ctx);
+    }
+    const topicId = questionTopicIds[index];
     const draftScore = draftScores[topicId];
+    if (message === i18next.t("endorsementActions.previousQuestion")) {
+      const prevTopicId = questionTopicIds[Math.max(0, index - 1)];
+      const topicIdToClear =
+        draftScore.score === undefined ? prevTopicId : topicId;
+      session.draftScores = {
+        ...session.draftScores,
+        [topicIdToClear]: {
+          score: undefined,
+          confidence: undefined,
+        },
+      };
+      return handleEndorsementFlowNextAction(ctx);
+    }
+
+    const keyboardBottomRow: string[] =
+      index === 0 && draftScore.score === undefined
+        ? keyboardBottomRowCancel()
+        : keyboardBottomRowCancelAndPreviousQuestion();
+    const scoreType = selectTopicScoreType(state, topicId);
     const confidenceValues = getConfidenceValues(scoreType);
     const scoreValues = getScoreValues(scoreType);
     if (draftScore.score === undefined) {
@@ -156,12 +210,13 @@ export async function handleEndorsementFlow(
             score: scoreValues[message],
           },
         };
-        i++;
       } else {
         if (scoreType === TopicScoreType.ONLY_CONFIDENCE) {
           if (!Object.keys(confidenceValues).includes(message)) {
             return ctx.reply(i18next.t("invalidValue"), {
-              ...replyMarkupArguments(confidenceKeyboard()),
+              ...replyMarkupArguments(
+                createKeyboard([...confidenceKeyboard(), keyboardBottomRow])
+              ),
             });
           }
           session.draftScores = {
@@ -172,11 +227,15 @@ export async function handleEndorsementFlow(
               confidence: confidenceValues[message],
             },
           };
-          i++;
         } else {
           if (!Object.keys(scoreValues).includes(message)) {
             return ctx.reply(i18next.t("invalidValue"), {
-              ...replyMarkupArguments(scoreKeyboards[scoreType]()),
+              ...replyMarkupArguments(
+                createKeyboard([
+                  ...scoreKeyboards[scoreType](),
+                  keyboardBottomRow,
+                ])
+              ),
             });
           }
           session.draftScores = {
@@ -190,15 +249,14 @@ export async function handleEndorsementFlow(
                   : draftScore.confidence,
             },
           };
-          if (scoreType === TopicScoreType.ONLY_SCORE_SPECTRUM) {
-            i++;
-          }
         }
       }
     } else {
       if (!Object.keys(confidenceValues).includes(message)) {
         return ctx.reply(i18next.t("invalidValue"), {
-          ...replyMarkupArguments(confidenceKeyboard()),
+          ...replyMarkupArguments(
+            createKeyboard([...confidenceKeyboard(), keyboardBottomRow])
+          ),
         });
       }
       session.draftScores = {
@@ -208,20 +266,7 @@ export async function handleEndorsementFlow(
           confidence: confidenceValues[message],
         },
       };
-      i++;
     }
   }
-  if (i < questionTopicIds.length) {
-    const topicId = questionTopicIds[i];
-    const draftScore = session.draftScores[topicId];
-    if (draftScore.score === undefined) {
-      return sendTopicQuestion(ctx, topicId);
-    } else {
-      return ctx.reply(i18next.t("howConfidentAreYouInYourAnswer"), {
-        ...replyMarkupArguments(confidenceKeyboard()),
-      });
-    }
-  } else {
-    return submitEndorsement(ctx);
-  }
+  return handleEndorsementFlowNextAction(ctx);
 }

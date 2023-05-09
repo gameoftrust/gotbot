@@ -20,6 +20,7 @@
     "very_high": "Very High",
     "yes": "Yes",
     "no": "No",
+    "previousQuestion": "Previous Question",
     "cancel": "Cancel"
   },
   "confirmSignature": "Please open your wallet application and confirm your request.",

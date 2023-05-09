@@ -2,7 +2,6 @@ import { ReputationGraph } from "../types/web3-v1-contracts";
 import i18next from "i18next";
 import {
   DraftScores,
-  ReplyKeyboardMarkup,
   Score,
   ScoreToSubmit,
   TelegramBotContext,
@@ -14,8 +13,6 @@ import { signTypedDataWithClientWallet } from "./client-wallet";
 import {
   addressRepresentationWithLink,
   canAccessBot,
-  createKeyboard,
-  getChatInvitationLink,
   getMainMenuKeyboard,
   getTelegramApi,
   replyMarkupArguments,
@@ -27,7 +24,7 @@ import {
   web3,
 } from "./web3";
 import {
-  finishOrCancelEndorsementFlow,
+  finishEndorsementFlow,
   getViewProfileLink,
 } from "./bot-utils/endorsementFlow";
 import {
@@ -41,7 +38,6 @@ import { selectAccountHashLastConnection } from "./store/walletConnections/selec
 import { keccak256 } from "@ethersproject/keccak256";
 import * as fs from "fs";
 import { EXPLORER_URL } from "./constants";
-import { getChatTypeTranslationArg } from "./i18n";
 
 export const getInitialDraftScores = () => {
   const questionTopicIds = selectQuestionTopicIds(store.getState());
@@ -167,17 +163,6 @@ export async function handleAfterEndorsement(ctx: TelegramBotContext) {
       ctx.session.userToEndorseCanAccessGroupBeforeEndorsement === false &&
       canAccessBot(userToEndorse)
     ) {
-      const inviteLink = await getChatInvitationLink(ctx);
-      await getTelegramApi(ctx).sendMessage(
-        walletConnection.chatId,
-        i18next.t("inviteToChat", {
-          inviteLink: inviteLink.invite_link,
-          ...getChatTypeTranslationArg(),
-        }),
-        {
-          disable_web_page_preview: true,
-        }
-      );
       await getTelegramApi(ctx).sendMessage(
         walletConnection.chatId,
         i18next.t("mainMenu"), //[‌](https://www.google.com/${signatue})
@@ -280,7 +265,7 @@ export async function submitEndorsement(ctx: TelegramBotContext) {
       await ctx.reply(String(e));
     }
   }
-  return finishOrCancelEndorsementFlow(ctx);
+  return finishEndorsementFlow(ctx);
 }
 
 export type ValueMap = {
@@ -338,49 +323,40 @@ export const getConfidenceValues = (
   }
 };
 
-const spectrumKeyboard = () =>
-  createKeyboard([
-    [i18next.t("endorsementActions.noIdea")!],
-    [
-      i18next.t("endorsementActions.medium")!,
-      i18next.t("endorsementActions.low")!,
-    ],
-    [
-      i18next.t("endorsementActions.very_high")!,
-      i18next.t("endorsementActions.high")!,
-    ],
-    [i18next.t("endorsementActions.cancel")!],
-  ]);
+const spectrumKeyboard = () => [
+  [i18next.t("endorsementActions.noIdea")!],
+  [
+    i18next.t("endorsementActions.medium")!,
+    i18next.t("endorsementActions.low")!,
+  ],
+  [
+    i18next.t("endorsementActions.very_high")!,
+    i18next.t("endorsementActions.high")!,
+  ],
+];
 
 export const scoreKeyboards: {
-  [topicScoreType in TopicScoreType]: () => ReplyKeyboardMarkup;
+  [topicScoreType in TopicScoreType]: () => string[][];
 } = {
-  [TopicScoreType.BINARY]: () =>
-    createKeyboard([
-      [i18next.t("endorsementActions.noIdea")!],
-      [
-        i18next.t("endorsementActions.yes")!,
-        i18next.t("endorsementActions.no")!,
-      ],
-      [i18next.t("endorsementActions.cancel")!],
-    ]),
+  [TopicScoreType.BINARY]: () => [
+    [i18next.t("endorsementActions.noIdea")!],
+    [i18next.t("endorsementActions.yes")!, i18next.t("endorsementActions.no")!],
+  ],
   [TopicScoreType.SPECTRUM]: spectrumKeyboard,
   [TopicScoreType.ONLY_CONFIDENCE]: spectrumKeyboard,
   [TopicScoreType.ONLY_SCORE_SPECTRUM]: spectrumKeyboard,
 };
 
-export const confidenceKeyboard = () =>
-  createKeyboard([
-    [
-      i18next.t("endorsementActions.medium")!,
-      i18next.t("endorsementActions.low")!,
-    ],
-    [
-      i18next.t("endorsementActions.very_high")!,
-      i18next.t("endorsementActions.high")!,
-    ],
-    [i18next.t("endorsementActions.cancel")!],
-  ]);
+export const confidenceKeyboard = (): string[][] => [
+  [
+    i18next.t("endorsementActions.medium")!,
+    i18next.t("endorsementActions.low")!,
+  ],
+  [
+    i18next.t("endorsementActions.very_high")!,
+    i18next.t("endorsementActions.high")!,
+  ],
+];
 
 export async function scoreSourceRepresentation(
   ctx: TelegramBotContext,

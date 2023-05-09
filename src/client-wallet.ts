@@ -155,6 +155,16 @@ export async function runPendingWalletAction(ctx: TelegramBotContext) {
     });
 }
 
+export async function sendConfirmSignatureMessage(ctx: TelegramBotContext) {
+  return ctx.reply(
+    i18next.t("confirmSignature") +
+      i18next.t("signatureReconnectWalletHelpMessage"),
+    {
+      ...replyMarkupArguments(openWalletButton(ctx)),
+    }
+  );
+}
+
 export async function signTypedDataWithClientWallet(
   ctx: TelegramBotContext,
   typedData: string
@@ -182,13 +192,7 @@ export async function signTypedDataWithClientWallet(
 
     ctx.session.pendingWalletAction = {
       walletAction: (activeClientWallet: ClientWallet) => {
-        ctx.reply(
-          i18next.t("confirmSignature") +
-            i18next.t("signatureReconnectWalletHelpMessage"),
-          {
-            ...replyMarkupArguments(openWalletButton(ctx)),
-          }
-        );
+        sendConfirmSignatureMessage(ctx);
         return activeClientWallet.sendCustomRequest(customRequest);
       },
       resolve,
