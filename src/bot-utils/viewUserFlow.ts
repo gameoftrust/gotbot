@@ -84,9 +84,9 @@ async function viewUserProfileInitialScene(ctx: TelegramBotContext) {
       parse_mode: "Markdown",
       ...replyMarkupArguments(
         createKeyboard([
-          [i18next.t("viewProfile.viewReceivedEndorsements")!],
-          [i18next.t("viewProfile.endorseUser")!],
-          [i18next.t("returnToMainMenu")!],
+          [i18next.t("viewProfile.viewReceivedEndorsements")],
+          [i18next.t("viewProfile.endorseUser")],
+          [i18next.t("returnToMainMenu")],
         ])
       ),
     }

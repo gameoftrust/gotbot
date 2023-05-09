@@ -37,6 +37,14 @@ async function setupBot() {
       })
     ).catch(console.log);
   });
+  bot.action(/.+/, (ctx) => {
+    handleMessage(
+      Object.assign(ctx, {
+        session: ctx.session ?? getInitialState(),
+      })
+    ).catch(console.log);
+    return ctx.answerCbQuery();
+  });
   bot.launch();
 
   setInterval(() => {

@@ -21,7 +21,10 @@ import {
   setUserToEndorse,
 } from "./endorsementFlow";
 import { findPerfectEndorsementPath } from "../web-of-trust";
-import { clientWalletTypes } from "../client-wallet";
+import {
+  clientWalletTypes,
+  sendConfirmSignatureMessage,
+} from "../client-wallet";
 import { Markup } from "telegraf";
 import { handleViewUserFlow } from "./viewUserFlow";
 import { getMessageScene, handleSendMessageFlow } from "./sendMessageFlow";
@@ -140,6 +143,11 @@ export async function handleConnectedUserState(
   message: string | null = null
 ): Promise<any> {
   const session = getSession(ctx);
+
+  if (session.pendingWalletAction && message !== i18next.t("cancel")) {
+    return sendConfirmSignatureMessage(ctx);
+  }
+
   const { account, userToEndorse, userToView, walletName, scene } = session;
   if (!account) throw new Error("account not provided");
   if (!walletName) throw new Error("walletName not provided");
@@ -227,9 +235,9 @@ export async function handleConnectedUserState(
 }
 
 export async function handlePrivateTextMessage(ctx: TelegramBotContext) {
-  let text = ctx.message && "text" in ctx.message ? ctx.message.text : null;
+  // @ts-ignore
+  let text: string | null = ctx.message?.text || ctx.match?.[0] || null;
   if (!text) {
-    console.log(getBotInfo(ctx).id);
     if (
       ctx.message &&
       "new_chat_members" in ctx.message &&
@@ -316,8 +324,9 @@ export function getReplyLink(
 }
 
 export async function handleMessage(ctx: TelegramBotContext) {
-  if (!ctx.message) return;
-  if (String(ctx.message.chat.id) === GOT_DEFAULT_CHAT_ID) {
+  // @ts-ignore
+  if (!ctx.message && !ctx.match[0]) return;
+  if (ctx.message && String(ctx.message.chat.id) === GOT_DEFAULT_CHAT_ID) {
     if (
       "is_automatic_forward" in ctx.message &&
       ctx.message.is_automatic_forward

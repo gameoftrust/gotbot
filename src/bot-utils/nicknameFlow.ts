@@ -110,7 +110,7 @@ export async function submitNickname(
     try {
       const nicknameObject: Parameters<
         Nickname["methods"]["setNicknameWithSignedData"]
-        >[0] = [account, newNickname, timestamp];
+      >[0] = [account, newNickname, timestamp];
       if (process.env.NICKNAME_CONTRACT_CALL_LOG_PATH) {
         fs.appendFile(
           process.env.NICKNAME_CONTRACT_CALL_LOG_PATH,
@@ -129,9 +129,9 @@ export async function submitNickname(
       store.dispatch(fetchNicknames());
       const txLink = EXPLORER_URL
         ? "\n\n" +
-        i18next.t("transactionExplorerLink", {
-          txLink: `${EXPLORER_URL}/tx/${tx.transactionHash}`,
-        })
+          i18next.t("transactionExplorerLink", {
+            txLink: `${EXPLORER_URL}/tx/${tx.transactionHash}`,
+          })
         : "";
       await ctx.reply(i18next.t("nickname.nicknameSubmitted") + txLink, {
         parse_mode: "MarkdownV2",
@@ -164,12 +164,14 @@ export async function handleSetNicknameFlow(
   if (!nicknameWarningAcknowledged) {
     if (message === i18next.t("okGotIt")) {
       ctx.session.nicknameWarningAcknowledged = true;
-      return ctx.reply(i18next.t("nickname.enterYourNickname"));
+      return ctx.reply(i18next.t("nickname.enterYourNickname"), {
+        ...replyMarkupArguments(createKeyboard([[i18next.t("cancel")]])),
+      });
     }
     return ctx.reply(i18next.t("nickname.nicknamePrivacyWarning"), {
       parse_mode: "Markdown",
       ...replyMarkupArguments(
-        createKeyboard([[i18next.t("okGotIt")!], [i18next.t("cancel")!]])
+        createKeyboard([[i18next.t("okGotIt")], [i18next.t("cancel")]])
       ),
     });
   }

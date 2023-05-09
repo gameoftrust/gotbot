@@ -20,8 +20,7 @@
     "very_high": "Very High",
     "yes": "Yes",
     "no": "No",
-    "previousQuestion": "Previous Question",
-    "cancel": "Cancel"
+    "previousQuestion": "Previous Question"
   },
   "confirmSignature": "Please open your wallet application and confirm your request.",
   "signatureReconnectWalletHelpMessage": "\n\nIf you don't see the signature prompt on your wallet application, use /reconnect",

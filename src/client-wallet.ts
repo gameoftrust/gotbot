@@ -8,7 +8,7 @@ import qr from "qrcode";
 import { Markup } from "telegraf";
 import { getSession } from "./session-utils";
 import i18next from "i18next";
-import { replyMarkupArguments } from "./bot-utils";
+import { createKeyboard, replyMarkupArguments } from "./bot-utils";
 import { v4 as uuidv4 } from "uuid";
 import { addWalletConnection } from "./store/walletConnections";
 import { store } from "./store";
@@ -115,12 +115,18 @@ export function openWalletButton(ctx: TelegramBotContext) {
     walletTypeObj.supportsOpenAppByDeeplinkAfterConnect
   ) {
     return {
-      ...Markup.inlineKeyboard([
-        Markup.button.url(
-          i18next.t("openWallet"),
-          walletTypeObj.deeplink + openWalletParameter
-        ),
-      ]),
+      ...Markup.inlineKeyboard(
+        [
+          Markup.button.url(
+            i18next.t("openWallet"),
+            walletTypeObj.deeplink + openWalletParameter
+          ),
+          Markup.button.callback(i18next.t("cancel"), i18next.t("cancel")),
+        ],
+        {
+          columns: 1,
+        }
+      ),
     };
   }
   return {};
@@ -160,7 +166,10 @@ export async function sendConfirmSignatureMessage(ctx: TelegramBotContext) {
     i18next.t("confirmSignature") +
       i18next.t("signatureReconnectWalletHelpMessage"),
     {
-      ...replyMarkupArguments(openWalletButton(ctx)),
+      ...replyMarkupArguments({
+        ...createKeyboard([[i18next.t("cancel")]]),
+        ...openWalletButton(ctx),
+      }),
     }
   );
 }

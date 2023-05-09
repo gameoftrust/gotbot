@@ -74,9 +74,9 @@ export function getLastUnansweredQuestionTopicIndex(ctx: TelegramBotContext) {
   return i;
 }
 
-const keyboardBottomRowCancel = () => [i18next.t("endorsementActions.cancel")];
+const keyboardBottomRowCancel = () => [i18next.t("cancel")];
 const keyboardBottomRowCancelAndPreviousQuestion = () => [
-  i18next.t("endorsementActions.cancel"),
+  i18next.t("cancel"),
   i18next.t("endorsementActions.previousQuestion"),
 ];
 
@@ -134,7 +134,7 @@ export async function handleEndorsementFlow(
     return finishEndorsementFlow(ctx);
   }
 
-  if (message === i18next.t("endorsementActions.cancel")) {
+  if (message === i18next.t("cancel")) {
     const u = session.userToView;
     resetSession(ctx);
     ctx.session.userToView = u;
@@ -166,7 +166,7 @@ export async function handleEndorsementFlow(
         ...replyMarkupArguments(
           createKeyboard([
             [i18next.t("endorsementActions.okGotIt")!],
-            [i18next.t("endorsementActions.cancel")!],
+            [i18next.t("cancel")!],
           ])
         ),
       }
