@@ -8,13 +8,10 @@ export const selectWalletConnections = createSelector(
   }
 );
 
-export const selectAccountHashLastConnection = createSelector(
+export const selectAccountLastConnection = createSelector(
   (state: RootState) => state.walletConnections,
-  (state: RootState, accountHash: string | null | undefined) => accountHash,
-  (walletConnections, accountHash) => {
-    const connections = walletConnections
-      .filter((c) => c.accountHash === accountHash)
-      .sort((c1, c2) => c2.timestamp - c1.timestamp);
-    return connections.length > 0 ? connections[0] : null;
+  (state: RootState, account: string | null | undefined) => account,
+  (walletConnections, account) => {
+    return walletConnections.find((c) => c.account === account);
   }
 );

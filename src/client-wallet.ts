@@ -12,7 +12,6 @@ import { createKeyboard, replyMarkupArguments } from "./bot-utils";
 import { v4 as uuidv4 } from "uuid";
 import { addWalletConnection } from "./store/walletConnections";
 import { store } from "./store";
-import { keccak256 } from "@ethersproject/keccak256";
 
 type ClientWalletType = {
   name: string;
@@ -31,11 +30,12 @@ export const clientWalletTypes: ClientWalletType[] = [
     deeplink: "https://metamask.app.link/",
     supportsOpenAppByDeeplinkAfterConnect: true,
   },
-  {
-    name: "Elastos Essentials",
-    deeplink: "https://essentials.elastos.net/",
-    supportsOpenAppByDeeplinkAfterConnect: true,
-  },
+  // This wallet works, but commenting it because of bad UI
+  // {
+  //   name: "Elastos Essentials",
+  //   deeplink: "https://essentials.elastos.net/",
+  //   supportsOpenAppByDeeplinkAfterConnect: true,
+  // },
   {
     name: "Avacus",
     deeplink: "https://avacus.app.link/",
@@ -65,8 +65,7 @@ export async function initializeClientWallet(
     ctx.session.account = newAccount;
     store.dispatch(
       addWalletConnection({
-        accountHash: keccak256(newAccount.toLowerCase()),
-        timestamp: Date.now(),
+        account: newAccount.toLowerCase(),
         chatId: ctx.message!.chat.id,
       })
     );

@@ -12,8 +12,7 @@ export const walletConnectionsSlice = createSlice({
     addWalletConnection: (state, action: PayloadAction<WalletConnection>) => {
       state = state.filter(
         (walletConnection) =>
-          walletConnection.accountHash !== action.payload.accountHash ||
-          walletConnection.chatId !== action.payload.chatId
+          walletConnection.account !== action.payload.account
       );
 
       state.push(action.payload);

@@ -35,11 +35,17 @@ const migrations: MigrationManifest = {
       }),
     };
   },
+  2: (oldState: any) => {
+    return {
+      ...oldState,
+      walletConnections: [],
+    };
+  },
 };
 
 const persistConfig = {
   key: "root",
-  version: 1,
+  version: 2,
   storage: new AsyncNodeStorage(process.env.REDUX_PERSISTENT_STORAGE_FOLDER),
   migrate: createMigrate(migrations, { debug: DEBUG }),
 };

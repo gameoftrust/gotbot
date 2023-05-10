@@ -34,8 +34,7 @@ import {
   selectTopicScoreType,
 } from "./store/reputationGraph/selectors";
 import { fetchScores } from "./store/reputationGraph/actions";
-import { selectAccountHashLastConnection } from "./store/walletConnections/selectors";
-import { keccak256 } from "@ethersproject/keccak256";
+import { selectAccountLastConnection } from "./store/walletConnections/selectors";
 import * as fs from "fs";
 import { EXPLORER_URL } from "./constants";
 
@@ -142,9 +141,9 @@ export async function handleAfterEndorsement(ctx: TelegramBotContext) {
     const { account, userToEndorse } = getSession(ctx);
     if (!account) throw new Error("account not provided");
     if (!userToEndorse) throw new Error("userToEndorse not provided");
-    const walletConnection = selectAccountHashLastConnection(
+    const walletConnection = selectAccountLastConnection(
       store.getState(),
-      keccak256(userToEndorse.toLowerCase())
+      userToEndorse.toLowerCase()
     );
     if (!walletConnection) return;
     if (!selectIsEvaluatedBy(store.getState(), [userToEndorse, account])) {
