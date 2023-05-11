@@ -13,6 +13,7 @@ import {
 } from "./store/reputationGraph/actions";
 import { getChatInfo } from "./store/gotSpaces/actions";
 import { GOT_DEFAULT_CHAT_ID } from "./constants";
+import { handleChatJoinRequest } from "./bot-utils/gotSpaceManagement";
 
 dotenv.config();
 
@@ -30,8 +31,15 @@ async function setupBot() {
   ]);
   await setupI18n();
   bot.use(session());
-  bot.on("message", async (ctx) => {
+  bot.on("message", (ctx) => {
     handleMessage(
+      Object.assign(ctx, {
+        session: ctx.session ?? getInitialState(),
+      })
+    ).catch(console.log);
+  });
+  bot.on("chat_join_request", (ctx) => {
+    handleChatJoinRequest(
       Object.assign(ctx, {
         session: ctx.session ?? getInitialState(),
       })

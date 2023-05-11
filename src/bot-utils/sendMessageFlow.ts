@@ -10,7 +10,6 @@ import {
   addressRepresentationWithLink,
   canAccessGroup,
   createKeyboard,
-  getChatInvitationLink,
   getTelegramApi,
   replyMarkupArguments,
   sendMainMenuMessage,
@@ -20,6 +19,7 @@ import { GOT_DEFAULT_CHAT_ID } from "../constants";
 import { selectDefaultChatInfo } from "../store/gotSpaces/selectors";
 import { store } from "../store";
 import { getChatTypeTranslationArg } from "../i18n";
+import { getChatInvitationLinkForCurrentUser } from "./gotSpaceManagement";
 
 function initialSendMessageScene(ctx: TelegramBotContext) {
   return ctx.reply(i18next.t("sendMessage.isReplyToAnotherMessage"), {
@@ -36,7 +36,10 @@ function initialSendMessageScene(ctx: TelegramBotContext) {
 async function getReplyMessageScene(ctx: TelegramBotContext) {
   let chatLink = "";
   try {
-    chatLink = (await getChatInvitationLink(ctx)).invite_link;
+    chatLink = await getChatInvitationLinkForCurrentUser(
+      ctx,
+      Number(GOT_DEFAULT_CHAT_ID)
+    );
   } catch (e) {
     console.log(e);
   }

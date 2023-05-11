@@ -33,6 +33,7 @@ import { handleSetNicknameFlow } from "./nicknameFlow";
 import { addressToRepresentation } from "../web3";
 import { handleVPNFlow } from "./VPNFlow";
 import { getChatTypeTranslationArg } from "../i18n";
+import { getChatInvitationLinkForCurrentUser } from "./gotSpaceManagement";
 
 export function addressRepresentationWithLink(
   ctx: TelegramBotContext,
@@ -132,12 +133,6 @@ export function sendMainMenuMessage(ctx: TelegramBotContext) {
   });
 }
 
-export async function getChatInvitationLink(ctx: TelegramBotContext) {
-  return getTelegramApi(ctx).createChatInviteLink(GOT_DEFAULT_CHAT_ID, {
-    member_limit: 1,
-  });
-}
-
 export async function handleConnectedUserState(
   ctx: TelegramBotContext,
   message: string | null = null
@@ -210,10 +205,13 @@ export async function handleConnectedUserState(
     ) {
       if (canAccessGroup(account)) {
         try {
-          const inviteLink = await getChatInvitationLink(ctx);
+          const inviteLink = await getChatInvitationLinkForCurrentUser(
+            ctx,
+            Number(GOT_DEFAULT_CHAT_ID)
+          );
           await ctx.reply(
             i18next.t("inviteToChat", {
-              inviteLink: inviteLink.invite_link,
+              inviteLink,
               ...getChatTypeTranslationArg(),
             })
           );

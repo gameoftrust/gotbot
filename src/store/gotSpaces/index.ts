@@ -3,7 +3,7 @@ import {
   GotSpaceInvite,
   GotSpaceMember,
 } from "../../../types";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getChatInfo } from "./actions";
 
 export type GotSpacesState = {
@@ -21,11 +21,23 @@ export const initialGotSpacesState: GotSpacesState = {
 export const gotSpacesSlice = createSlice({
   name: "gotSpaces",
   initialState: initialGotSpacesState,
-  reducers: {},
+  reducers: {
+    setSpaceInvites: (state, action: PayloadAction<GotSpaceInvite[]>) => {
+      state.spaceInvites = action.payload;
+    },
+    setSpaceMembers: (state, action: PayloadAction<GotSpaceMember[]>) => {
+      state.spaceMembers = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getChatInfo.fulfilled, (state, action) => {
       const chatInfo = action.payload;
-      state.spaceChatInfos = [...state.spaceChatInfos, chatInfo];
+      state.spaceChatInfos = [
+        ...state.spaceChatInfos.filter((ci) => ci.id != chatInfo.id),
+        chatInfo,
+      ];
     });
   },
 });
+
+export const { setSpaceInvites, setSpaceMembers } = gotSpacesSlice.actions;

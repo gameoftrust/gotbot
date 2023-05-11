@@ -147,7 +147,7 @@ export type GotSpaceChatInfo = ChatFromGetChat;
 
 export type GotSpaceInvite = {
   account: string;
-  spaceChatId: string;
+  spaceChatId: number;
   inviteLink: string;
   timestamp: number;
 };
