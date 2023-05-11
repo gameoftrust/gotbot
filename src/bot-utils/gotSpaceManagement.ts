@@ -76,6 +76,7 @@ export async function handleChatJoinRequest(
       .catch(console.log);
     return;
   }
+  //TODO: kick other chat members with the same account as the one requesting to join
   await getTelegramApi(ctx).approveChatJoinRequest(
     chatJoinRequest.chat.id,
     userToJoinId

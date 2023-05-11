@@ -34,7 +34,7 @@
   "signatureAccepted": "امضا دریافت شد! در حال ثبت درخواست روی بلاک چین...",
   "mainMenu": "چه کاری میتونم براتون انجام بدم؟",
   "getChatInvitationLink": "عضویت در {{chatType}}",
-  "inviteToChat": "ترجیحا با شماره مجازی وارد {{chatType}} بشید و اگر ندارید، برای دریافت شماره مجازی از /vnum استفاده کنید.\n\nلینک دعوت شما به {{chatType}}:\n\n{{inviteLink}}",
+  "inviteToChat": "ترجیحا با شماره مجازی وارد {{chatType}} بشید و اگر ندارید، برای دریافت شماره مجازی از /vnum استفاده کنید.\n\nبعد از باز کردن لینک دعوت، درخواست عضویت در {{chatType}} به شما نمایش داده میشه. سپس Request to join رو بزنید تا بات شما رو به {{chatType}} اضافه کنه.\n\nلینک دعوت شما به {{chatType}}:\n\n{{inviteLink}}",
   "getProfileLink": "لینک پروفایل من",
   "sendMessage": {
     "sendMessageInChat": "ارسال پیام در {{chatType}}",
