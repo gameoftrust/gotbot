@@ -26,6 +26,11 @@ export const clientWalletTypes: ClientWalletType[] = [
     supportsOpenAppByDeeplinkAfterConnect: true,
   },
   {
+    name: "Avacus",
+    deeplink: "https://avacus.app.link/",
+    supportsOpenAppByDeeplinkAfterConnect: false,
+  },
+  {
     name: "MetaMask Mobile",
     deeplink: "https://metamask.app.link/",
     supportsOpenAppByDeeplinkAfterConnect: true,
@@ -36,11 +41,6 @@ export const clientWalletTypes: ClientWalletType[] = [
   //   deeplink: "https://essentials.elastos.net/",
   //   supportsOpenAppByDeeplinkAfterConnect: true,
   // },
-  {
-    name: "Avacus",
-    deeplink: "https://avacus.app.link/",
-    supportsOpenAppByDeeplinkAfterConnect: false,
-  },
 ];
 
 export async function initializeClientWallet(
