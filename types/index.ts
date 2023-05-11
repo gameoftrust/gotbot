@@ -143,4 +143,17 @@ export type WalletConnection = {
   account: string;
 };
 
-export type ChatInfo = ChatFromGetChat;
+export type GotSpaceChatInfo = ChatFromGetChat;
+
+export type GotSpaceInvite = {
+  account: string;
+  spaceChatId: string;
+  inviteLink: string;
+  timestamp: number;
+};
+
+export type GotSpaceMember = {
+  account: string;
+  userId: number;
+  spaceChatId: number;
+};

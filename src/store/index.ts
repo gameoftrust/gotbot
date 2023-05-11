@@ -1,23 +1,12 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { reputationGraphSlice, ReputationGraphState } from "./reputationGraph";
-import { nicknamesSlice, NicknamesState } from "./nickname";
+import { reputationGraphSlice } from "./reputationGraph";
+import { nicknamesSlice } from "./nickname";
 import { createMigrate, persistReducer, persistStore } from "redux-persist";
 import { AsyncNodeStorage } from "redux-persist-node-storage";
-import {
-  walletConnectionsSlice,
-  WalletConnectionsState,
-} from "./walletConnections";
-import { gotChatInfosSlice, GotChatInfosState } from "./gotChatInfo";
-import { MigrationManifest, PersistState } from "redux-persist/es/types";
+import { walletConnectionsSlice } from "./walletConnections";
+import { gotSpacesSlice } from "./gotSpaces";
+import { MigrationManifest } from "redux-persist/es/types";
 import { DEBUG } from "../constants";
-
-export type RootState = {
-  reputationGraph: ReputationGraphState;
-  nicknames: NicknamesState;
-  walletConnections: WalletConnectionsState;
-  gotChatInfos: GotChatInfosState;
-  _persist: PersistState;
-};
 
 if (process.env.REDUX_PERSISTENT_STORAGE_FOLDER === undefined) {
   throw new Error(
@@ -53,7 +42,7 @@ const persistConfig = {
 const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
-    gotChatInfos: gotChatInfosSlice.reducer,
+    gotSpaces: gotSpacesSlice.reducer,
     reputationGraph: reputationGraphSlice.reducer,
     nicknames: nicknamesSlice.reducer,
     walletConnections: walletConnectionsSlice.reducer,
@@ -71,5 +60,7 @@ export const store = configureStore({
       },
     }),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
 
 const persistor = persistStore(store);

@@ -10,13 +10,13 @@ import {
   fetchScores,
 } from "./actions";
 
-export interface ReputationGraphState {
+export type ReputationGraphState = {
   graphId: string;
   scores: Score[] | null;
   scoresLastFetchedTimestamp: number | null;
   metadata: ReputationGraphMetadata;
   graphTopicsMetadata: GraphTopicsMetadata;
-}
+};
 
 const initialReputationGraphState: ReputationGraphState = {
   graphId: "",
@@ -27,7 +27,7 @@ const initialReputationGraphState: ReputationGraphState = {
       address: "0x0",
       chainId: 0,
     },
-    endorsementManifestURI: '',
+    endorsementManifestURI: "",
     mainTopicId: "0",
     questionTopicIds: ["0"],
   },

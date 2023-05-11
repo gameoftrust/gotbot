@@ -11,7 +11,7 @@ import {
   fetchReputationGraphMetadata,
   fetchScores,
 } from "./store/reputationGraph/actions";
-import { getChatInfo } from "./store/gotChatInfo/actions";
+import { getChatInfo } from "./store/gotSpaces/actions";
 import { GOT_DEFAULT_CHAT_ID } from "./constants";
 
 dotenv.config();

@@ -2,10 +2,10 @@ import { NicknameObject } from "../../../types";
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchNicknames } from "./actions";
 
-export interface NicknamesState {
+export type NicknamesState = {
   nicknameObjects: NicknameObject[] | null;
   nicknamesLastFetchedTimestamp: number | null;
-}
+};
 
 const initialNicknamesState: NicknamesState = {
   nicknameObjects: null,

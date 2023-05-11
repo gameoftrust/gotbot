@@ -17,7 +17,7 @@ import {
   sendUserProfileLink,
 } from "./index";
 import { GOT_DEFAULT_CHAT_ID } from "../constants";
-import { selectDefaultChatInfo } from "../store/gotChatInfo/selectors";
+import { selectDefaultChatInfo } from "../store/gotSpaces/selectors";
 import { store } from "../store";
 import { getChatTypeTranslationArg } from "../i18n";
 

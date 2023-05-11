@@ -4,7 +4,7 @@ import translationFa from "../locales/fa.json";
 import translationEn from "../locales/en.json";
 import { store } from "./store";
 import { GraphTopicsMetadata, TopicId, TopicMetadata } from "../types";
-import { selectDefaultChatInfo } from "./store/gotChatInfo/selectors";
+import { selectDefaultChatInfo } from "./store/gotSpaces/selectors";
 
 //TODO: add _md to translation items that should be in markdown format
 
