@@ -34,22 +34,13 @@ export async function handleVPNFlow(
   }
 
   if (scene === Scene.VPN_AGREEMENT && message === i18next.t("okGotIt")) {
-    await ctx.reply(process.env.VPN_CONFIG || "VPN Config not provided");
-    await ctx.reply(
-      "برنامه ی مناسب برای دستگاهتون رو از لینک های زیر دانلود کنید و کانفیگ بالا رو داخلش وارد کنید. اگر راهنمایی لازم داشتید به @gotbotsup پیام بدید.\n" +
-        "\n" +
-        "[ویندوز](https://github.com/2dust/v2rayN/releases/download/6.23/v2rayN.zip)\n" +
-        "\n" +
-        "[اندروید](https://github.com/2dust/v2rayNG/releases/download/1.8.3/v2rayNG_1.8.3.apk)\n" +
-        "\n" +
-        "[آی او اس](https://apps.apple.com/us/app/wings-x/id6446119727)\n" +
-        "\n" +
-        "حتما آخرین نسخه رو از لینک های داده شده دانلود و نصب کنید، و ساعت سیستمتون هم روی حالت خودکار باشه، وگرنه کانفیگ کار نمی کنه",
-      {
-        disable_web_page_preview: true,
-        parse_mode: "Markdown",
-      }
-    );
+    await ctx.reply(i18next.t("VPNGuide"), {
+      disable_web_page_preview: true,
+      parse_mode: "Markdown",
+    });
+    await ctx.reply(process.env.VPN_CONFIG || "VPN Config not provided", {
+      parse_mode: "Markdown",
+    });
     resetSession(ctx);
     return handleConnectedUserState(ctx);
   }
